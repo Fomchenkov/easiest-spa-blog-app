@@ -3,5 +3,5 @@
 ```
 Server + API - NodeJS + Express
 Sequelize ORM sqlite3
-Front-End - AJAX requests without reload
+Front-End - AJAX requests without reload. Using Vue Framework
 ```
