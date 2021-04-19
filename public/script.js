@@ -1,55 +1,64 @@
-const parseData = (event) => {
-    const xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            const response = JSON.parse(xhttp.responseText)
-            let html = ''
-            response.forEach(element => {
-                html += `<div id="element_${element['id']}"><p>Titile: ${element['title']}</p><p>Content: ${element['content']}</p></div><br>`
-            })
-            if (html.length == 0) {
-                html = 'No elements exist'
+const app = Vue.createApp({
+    data() {
+        return {
+            data_html: '',
+        }
+    },
+    methods: {
+        parseData: function() {
+            const xhttp = new XMLHttpRequest()
+            let this_parent = this;
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    const response = JSON.parse(xhttp.responseText)
+                    let html = ''
+                    response.forEach(element => {
+                        html += `<div id="element_${element['id']}"><p>Titile: ${element['title']}</p><p>Content: ${element['content']}</p></div><br>`
+                    })
+                    if (html.length == 0) {
+                        html = 'No elements exist'
+                    }
+                    this_parent.data_html = html
+                }
             }
-            document.getElementById("main").innerHTML = html
-        }
-    }
-    xhttp.open("GET", "post", true)
-    xhttp.send()
-}
+            xhttp.open("GET", "post", true)
+            xhttp.send()
+        },
+        deleteAllData: function() {
+            const xhttp = new XMLHttpRequest()
+            let this_parent = this;
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    this_parent.parseData()
+                }
+            }
+            xhttp.open("GET", "post_delete", true)
+            xhttp.send()
+        },
+        addRandomPost: function() {
+            let form_data = 'title=' + encodeURIComponent('AUCOMATICALLY Title') +
+            '&content=' + encodeURIComponent('AUCOMATICALLY Content');
+            let this_parent = this;
+            const xhttp = new XMLHttpRequest()
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    this_parent.parseData()
+                }
+            }
+            xhttp.open("POST", "post", true)
+            xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+            xhttp.send(form_data)
+        },
+    },
+    created() {
+        this.parseData()
+        console.log('Created')
+    },
+})
 
-const deleteAllData = (event) => {
-    const xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            alert('Success destroyed')
-        }
-    }
-    xhttp.open("GET", "post_delete", true)
-    xhttp.send()
-}
+app.component('todo-item', {
+    props: ['todo'],
+    template: `<li>{{ todo.text }}</li>`
+})
 
-const addRandomPost = (event) => {
-    let form_data = 'title=' + encodeURIComponent('AUCOMATICALLY Title') +
-    '&content=' + encodeURIComponent('AUCOMATICALLY Content');
-
-    const xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            alert('Post added success')
-        }
-    }
-    xhttp.open("POST", "post", true)
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-    xhttp.send(form_data)
-}
-
-const loadHandlers = (event) => {
-    const reloadButton = document.getElementById('reloadPage')
-    const deleteAllDataButton = document.getElementById('deleteAllData')
-    const addRandomPostButton = document.getElementById('addRandomPost')
-    reloadButton.addEventListener('click', parseData)
-    deleteAllDataButton.addEventListener('click', deleteAllData)
-    addRandomPostButton.addEventListener('click', addRandomPost)
-}
-
-document.addEventListener("DOMContentLoaded", loadHandlers)
+app.mount('#app')
