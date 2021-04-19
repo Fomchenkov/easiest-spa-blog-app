@@ -13,5 +13,12 @@
             </p>
         </div>
         <span v-html="data_html"></span>
+        <blog-post
+            v-for="post in posts"
+            :key="post.id"
+            :id="post.id"
+            :title="post.title"
+            :content="post.content"
+        ></blog-post>
     </div>
 </body>

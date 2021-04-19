@@ -2,6 +2,7 @@ const app = Vue.createApp({
     data() {
         return {
             data_html: '',
+            posts: []
         }
     },
     methods: {
@@ -11,14 +12,14 @@ const app = Vue.createApp({
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     const response = JSON.parse(xhttp.responseText)
-                    let html = ''
+                    this_parent.posts = []
                     response.forEach(element => {
-                        html += `<div id="element_${element['id']}"><p>Titile: ${element['title']}</p><p>Content: ${element['content']}</p></div><br>`
+                        this_parent.posts.push({id: element['id'], title: element['title'], content: element['content']})
                     })
-                    if (html.length == 0) {
-                        html = 'No elements exist'
+                    this_parent.data_html = ''
+                    if (this_parent.posts.length == 0) {
+                        this_parent.data_html = 'No elements exist'
                     }
-                    this_parent.data_html = html
                 }
             }
             xhttp.open("GET", "post", true)
@@ -56,9 +57,9 @@ const app = Vue.createApp({
     },
 })
 
-app.component('todo-item', {
-    props: ['todo'],
-    template: `<li>{{ todo.text }}</li>`
-})
+app.component('blog-post', {
+    props: ['id', 'title', 'content'],
+    template: `<div  v-bind="{ id: 'element_' + id }"><p>{{ title }}</p><p>{{ content }}</p></div><br>`
+})  
 
 app.mount('#app')
